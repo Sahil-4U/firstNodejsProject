@@ -21,7 +21,7 @@ app.set("view engine", "ejs");
 
 //mongodb connection
 mongoose.set('strictQuery', false);
-const uri = 'mongodb+srv://Sahil:9992@cluster0.7dhdonx.mongodb.net/todoApp';
+const uri = '//enter your mongourl here';
 mongoose.connect(uri)
     .then(() => {
         console.log(clc.yellowBright("connected with mongodb"));
