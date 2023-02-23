@@ -11,6 +11,7 @@ const session = require("express-session");
 const { isAuth, isValid } = require('./middlewares/authmiddleware');
 const mongodbSession = require('connect-mongodb-session')(session);
 const TodoModles = require("./Models/TodoModles");
+const rateLimiting = require('./middlewares/ratelimiting');
 const ObjectId = require('mongoose').ObjectId;
 
 //how to make our port dynamic
@@ -21,7 +22,7 @@ app.set("view engine", "ejs");
 
 //mongodb connection
 mongoose.set('strictQuery', false);
-const uri = '//enter your mongourl here';
+const uri = 'mongodb+srv://Sahil:9992@cluster0.7dhdonx.mongodb.net/todoApp';
 mongoose.connect(uri)
     .then(() => {
         console.log(clc.yellowBright("connected with mongodb"));
@@ -166,22 +167,22 @@ app.post("/login", async (req, res) => {
 })
 //new route for checking req.session
 app.get('/dashboard', isAuth, async (req, res) => {
-    const username=req.session.user.username;//here we fetch username
+    // const username=req.session.user.username;//here we fetch username
     
-    let todos=[];
-    try{
-        todos=await TodoModles.find({username:username});//here we find the data with username
-        // console.log(username);
-        // console.log(todos);
-    }catch(error){
-        console.log(error);
-        return res.send({
-            status:400,
-            message:"bad request",
-            error:error
-        })
-    }
-    return res.render('dashboard',{todos:todos});
+    // let todos=[];
+    // try{
+    //     todos=await TodoModles.find({username:username});//here we find the data with username
+    //     // console.log(username);
+    //     // console.log(todos);
+    // }catch(error){
+    //     console.log(error);
+    //     return res.send({
+    //         status:400,
+    //         message:"bad request",
+    //         error:error
+    //     })
+    // }
+    return res.render('dashboard');
 });
 app.post("/logout", isAuth, (req, res) => {
     console.log(req.session);
@@ -213,7 +214,7 @@ app.post("/logout_from_all_devices", isAuth, async (req, res) => {
     }
 })
 //post req to handle creat-todo
-app.post("/create-item", isAuth, async (req, res) => {
+app.post("/create-item", isAuth,rateLimiting, async (req, res) => {
     const todotext = req.body.todo;
     const username = req.session.user.username;
     if (!todotext) {
@@ -334,6 +335,38 @@ app.post("/delete-item", isAuth, async (req, res) => {
         })
     }
 })
+//pagination route
+app.get("/pagination_dashboard",isAuth,async(req,res)=>{
+    const skip=req.query.skip || 0;//we will get this from client side
+    const LIMIT=3;//limit is backend engineer choice as much you need you can set it
+
+    const username=req.session.user.username;
+
+    //mongodb aggregate function
+    //this is db call so we put it in try catch block
+    try{
+        const todos= await TodoModles.aggregate([
+            {$match:{username:username}},
+            {
+                $facet:{
+                    data:[{$skip:parseInt(skip)},{$limit:LIMIT}],
+                },
+            }
+        ]);
+        // console.log(todos[0].data);
+        return res.send({
+            status:200,
+            message:"read successfull",
+            data:todos
+        })
+    }catch(error){
+        return res.send({
+            status:400,
+            message:"read Unsuccessfull",
+            error:error
+        })
+    }
+});
 //start our port
 app.listen(PORT, () => {
     console.log(clc.yellow("server is started"));

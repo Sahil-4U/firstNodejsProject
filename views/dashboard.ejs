@@ -11,7 +11,7 @@
         <h1 class="display-4 text-center py-1">To-Do App</h1>
         
         <div class="jumbotron p-3 shadow-sm">
-          <form id="create_form" action='/create-item' method="POST">
+          <form id="create_form">
             <div class="d-flex align-items-center">
               <input id="create_field" name='todo' autofocus autocomplete="off" class="form-control mr-3" type="text" style="flex: 1;">
               <button class="add_item btn btn-primary">Add New Item</button>
@@ -21,6 +21,11 @@
         <ul id="item_list" class=""list-group pb-5>
          
         </ul>
+        <button class="show_more">
+          Show More
+        </button>
+        <br/>
+        <br/>
 
       <form action='/logout' method="POST">
         <button> Logout <button>
@@ -31,9 +36,6 @@
       </form>
 
       </div>
-      <script>
-        var todos = <%-JSON.stringify(todos)%>
-      </script>
       <script  src="https://unpkg.com/axios/dist/axios.min.js"> </script>
       <script src="/browser.js"></script>
     </body>
