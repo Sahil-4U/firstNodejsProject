@@ -1,3 +1,5 @@
+// import axios from 'axios';
+
 let skip = 0;
 document.addEventListener("click", function (event) {
   if (event.target.classList.contains("add_item")) {
@@ -108,6 +110,12 @@ function generatetodos() {
       return;
     });
 
+}
+function register(){
+  window.location.href='/register';
+}
+function login(){
+  window.location.href='/login';
 }
 
   //client(axios) <---APIs--->backend(routes) <---> Database

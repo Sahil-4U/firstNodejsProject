@@ -55,16 +55,17 @@ app.use(
 const saltRound = 10;
 //routes
 app.get('/', (req, res) => {
-    res.send('this is home route');
+    res.render('home');
 })
 
 app.get('/register', (req, res) => {
     res.render('register');
-})
+});
 
 app.get('/login', (req, res) => {
     res.render('login');
-})
+});
+//register route
 app.post('/register', async (req, res) => {
     console.log(req.body);
     const { name, email, username, password } = req.body;
@@ -184,6 +185,7 @@ app.get('/dashboard', isAuth, async (req, res) => {
     // }
     return res.render('dashboard');
 });
+//logout route
 app.post("/logout", isAuth, (req, res) => {
     console.log(req.session);
     req.session.destroy((err) => {
@@ -192,6 +194,7 @@ app.post("/logout", isAuth, (req, res) => {
         res.redirect("/login");
     })
 });
+//logout from all devices
 app.post("/logout_from_all_devices", isAuth, async (req, res) => {
     const username = req.session.user.username;
     //create a schema
